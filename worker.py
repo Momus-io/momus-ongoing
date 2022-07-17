@@ -18,6 +18,7 @@ headers = {
 
 
 def main():
+    print("GETTING TWEETS!")
     response = requests.get(
         f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T12:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at", headers=headers)
 
@@ -32,8 +33,6 @@ def main():
         q = db.text(text)
         result = conn.execute(
             q, id=tweet["id"], text=tweet["text"], created_at=tweet["created_at"])
-
-        print(result)
 
     conn.close()
 

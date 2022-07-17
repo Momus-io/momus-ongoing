@@ -16,23 +16,53 @@ headers = {
     "Authorization": f"Bearer {authorization}"
 }
 
+base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&start_time=2022-01-04T12:00:00Z&end_time=2022-03-09T23:59:59Z&tweet.fields=created_at"
+
 
 def main():
-    print("GETTING TWEETS!")
-    response = requests.get(
-        f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T12:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at", headers=headers)
+    all_tweets = []
+    total_iterations = 1
 
-    tweet_list = response.json()
+    def get_tweets(pagination_token=None):
+        global base_url
+        if pagination_token != None:
+            new_url = base_url + "&pagination_token=" + pagination_token
+        else:
+            new_url = base_url
+
+        response = requests.get(
+            f"{new_url}", headers=headers)
+
+        tweet_list = response.json()
+
+        if tweet_list["meta"]["result_count"] == 0:
+            print("No tweets")
+            return True
+
+        all_tweets.extend(tweet_list["data"])
+
+        if "next_token" in tweet_list["meta"]:
+            nonlocal total_iterations
+            total_iterations += 1
+            print("Getting next result set: ", total_iterations)
+            return get_tweets(tweet_list["meta"]["next_token"])
+
+        return True
+
+    get_tweets()
 
     engine = db.create_engine(
         f"postgresql://{database_url}", echo=True)
 
     conn = engine.connect()
-    for tweet in tweet_list["data"]:
+    for tweet in all_tweets:
         text = "INSERT INTO tweets (id, text, created_at) VALUES (:id, :text, :created_at)"
         q = db.text(text)
+
         result = conn.execute(
             q, id=tweet["id"], text=tweet["text"], created_at=tweet["created_at"])
+
+        print(result)
 
     conn.close()
 

@@ -15,8 +15,7 @@ yesterday = (datetime.datetime.today() -
 headers = {
     "Authorization": f"Bearer {authorization}"
 }
-
-base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&start_time=2022-01-04T12:00:00Z&end_time=2022-03-09T23:59:59Z&tweet.fields=created_at"
+base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&start_time={yesterday}T12:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at"
 
 
 def main():
@@ -50,6 +49,9 @@ def main():
         return True
 
     get_tweets()
+
+    if len(all_tweets) == 0:
+        return True
 
     engine = db.create_engine(
         f"postgresql://{database_url}", echo=True)

@@ -1,12 +1,9 @@
-from apscheduler.schedulers.background import BlockingScheduler
+import sched
+from apscheduler.schedulers.blocking import BlockingScheduler
 import worker
 
-sched = BlockingScheduler()
+scheduler = BlockingScheduler()
 
+scheduler.add_job(worker.main(), "cron", hour=21, minute=33)
 
-@sched.scheduled_job("cron", hour=20, minute=2)
-def scheduled_job():
-    worker.main()
-
-
-sched.start()
+scheduler.start()

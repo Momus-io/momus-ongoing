@@ -19,6 +19,7 @@ base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&sta
 
 
 def main():
+    print("GETTING TWEETS")
     all_tweets = []
     total_iterations = 1
 

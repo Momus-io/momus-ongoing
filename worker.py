@@ -12,7 +12,7 @@ headers = {
     "Authorization": f"Bearer {authorization}"
 }
 
-base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
+base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
 
 
 def main():
@@ -68,7 +68,7 @@ def main():
                 conn.commit()
                 print(f"Tweet ID {id} added to database.")
             else:
-                print(f"Tweet {id} already exists in database.")
+                print(f"Tweet ID {id} already exists in database.")
 
     except psycopg2.OperationalError as error:
         print("Database not connected successfully", error)

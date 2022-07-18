@@ -1,16 +1,12 @@
-import os
 import requests
 import datetime
-import sqlalchemy as db
-from dotenv import load_dotenv
-
-load_dotenv(".env")
-
-authorization = os.getenv("AUTHORIZATION")
-database_url = os.getenv("DATABASE_URL")
+import psycopg2
+from config import env_vars
 
 yesterday = (datetime.datetime.today() -
              datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
+authorization = env_vars["authorization"]
 
 headers = {
     "Authorization": f"Bearer {authorization}"
@@ -53,21 +49,35 @@ def main():
 
     get_tweets()
 
-    engine = db.create_engine(
-        f"postgresql://{database_url}", echo=True)
+    try:
+        conn = psycopg2.connect(dbname=env_vars["db_name"], user=env_vars["db_user"],
+                                password=env_vars["db_pass"], host=env_vars["db_host"], port=env_vars["db_port"])
 
-    conn = engine.connect()
+        cursor = conn.cursor()
 
-    for tweet in all_tweets:
-        text = "INSERT INTO tweets (id, text, created_at) VALUES (:id, :text, :created_at)"
-        q = db.text(text)
+        for tweet in all_tweets:
+            id, text, created_at = tweet["id"], tweet["text"], tweet["created_at"]
+            select_query = "SELECT * FROM tweets WHERE id = %s"
+            cursor.execute(select_query, (id,))
+            result = cursor.fetchone()
 
-        result = conn.execute(
-            q, id=tweet["id"], text=tweet["text"], created_at=tweet["created_at"])
+            if result == None:
+                insert_query = "INSERT INTO tweets (id, text, created_at) VALUES (%s, %s, %s)"
+                cursor.execute(
+                    insert_query, (id, text, created_at,))
+                conn.commit()
+                print(f"Tweet ID {id} added to database.")
+            else:
+                print(f"Tweet {id} already exists in database.")
 
-        print(result)
+    except psycopg2.OperationalError as error:
+        print("Database not connected successfully", error)
 
-    conn.close()
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+            print("Connection closed.")
 
 
 if __name__ == "__main__":

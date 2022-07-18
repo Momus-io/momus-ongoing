@@ -1,9 +1,9 @@
-import sched
-from apscheduler.schedulers.blocking import BlockingScheduler
+import schedule
+import time
 import worker
 
-scheduler = BlockingScheduler()
+schedule.every().day.at("21:47:00").do(worker.main())
 
-scheduler.add_job(worker.main(), "cron", hour=21, minute=33)
-
-scheduler.start()
+while True:
+    schedule.run_pending()
+    time.sleep(1)

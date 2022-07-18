@@ -4,7 +4,7 @@ import worker
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job("cron", hour=19, minute=52)
+@sched.scheduled_job("cron", hour=20, minute=2)
 def scheduled_job():
     worker.main()
 

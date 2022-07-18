@@ -57,6 +57,7 @@ def main():
         f"postgresql://{database_url}", echo=True)
 
     conn = engine.connect()
+
     for tweet in all_tweets:
         text = "INSERT INTO tweets (id, text, created_at) VALUES (:id, :text, :created_at)"
         q = db.text(text)

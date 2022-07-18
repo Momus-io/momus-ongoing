@@ -16,10 +16,12 @@ headers = {
     "Authorization": f"Bearer {authorization}"
 }
 
-base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&start_time={yesterday}T00:00:00Z&tweet.fields=created_at&exclude=retweets"
+base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=10&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
 
 
 def main():
+    print("Job running...")
+
     all_tweets = []
     total_iterations = 1
 
@@ -36,7 +38,7 @@ def main():
         tweet_list = response.json()
 
         if tweet_list["meta"]["result_count"] == 0:
-            print("No tweets")
+            print("Job finished: No tweets.")
             return True
 
         all_tweets.extend(tweet_list["data"])
@@ -50,9 +52,6 @@ def main():
         return True
 
     get_tweets()
-
-    if len(all_tweets) == 0:
-        return True
 
     engine = db.create_engine(
         f"postgresql://{database_url}", echo=True)

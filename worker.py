@@ -71,7 +71,7 @@ def main():
                 print(f"Tweet ID {id} already exists in database.")
 
     except psycopg2.OperationalError as error:
-        print("Database not connected successfully", error)
+        print("Database not connected.", error)
 
     finally:
         if conn:

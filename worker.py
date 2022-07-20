@@ -1,6 +1,7 @@
-import requests
 import datetime
+import requests
 import psycopg2
+from twilio.rest import Client
 from config import env_vars
 
 yesterday = (datetime.datetime.today() -
@@ -74,10 +75,25 @@ def main():
         print("Database not connected.", error)
 
     finally:
+        client = Client(env_vars["twilio_sid"], env_vars["twilio_token"])
+        body = ""
+
         if conn:
             cursor.close()
             conn.close()
             print("Connection closed.")
+
+            if len(all_tweets) > 0:
+                body = f"Total tweets added: {len(all_tweets)}."
+            else:
+                body = "No tweets added."
+        else:
+            body = "Error connecting to DB."
+
+        client.messages.create(
+            to=env_vars["twilio_to"],
+            from_=env_vars["twilio_from"],
+            body=body)
 
 
 if __name__ == "__main__":

@@ -11,5 +11,7 @@ env_vars = {
     "db_host": os.getenv("DB_HOST"),
     "db_port": os.getenv("DB_PORT"),
     "twilio_sid": os.getenv("TWILIO_SID"),
-    "twilio_token": os.getenv("TWILIO_TOKEN")
+    "twilio_token": os.getenv("TWILIO_TOKEN"),
+    "twilio_to": os.getenv("TWILIO_TO"),
+    "twilio_from": os.getenv("TWILIO_FROM")
 }

@@ -1,29 +1,30 @@
 import datetime
+import logging
 import requests
 import psycopg2
 from twilio.rest import Client
 from config import env_vars
 
-yesterday = (datetime.datetime.today() -
-             datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-
-authorization = env_vars["authorization"]
-
-headers = {
-    "Authorization": f"Bearer {authorization}"
-}
-
-base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
-
 
 def main():
     print("Job running...")
 
+    yesterday = (datetime.datetime.today() -
+                 datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
+    authorization = env_vars["authorization"]
+
+    headers = {
+        "Authorization": f"Bearer {authorization}"
+    }
+
+    base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
+
     all_tweets = []
     total_iterations = 1
+    tweets_added = 0
 
     def get_tweets(pagination_token=None):
-        global base_url
         if pagination_token != None:
             new_url = base_url + "&pagination_token=" + pagination_token
         else:
@@ -31,6 +32,8 @@ def main():
 
         response = requests.get(
             f"{new_url}", headers=headers)
+
+        response.raise_for_status()
 
         tweet_list = response.json()
 
@@ -63,6 +66,7 @@ def main():
             result = cursor.fetchone()
 
             if result == None:
+                tweets_added += 1
                 insert_query = "INSERT INTO tweets (id, text, created_at) VALUES (%s, %s, %s)"
                 cursor.execute(
                     insert_query, (id, text, created_at,))
@@ -84,7 +88,7 @@ def main():
             print("Connection closed.")
 
             if len(all_tweets) > 0:
-                body = f"Total tweets added: {len(all_tweets)}."
+                body = f"Total tweets added: {tweets_added}."
             else:
                 body = "No tweets added."
         else:

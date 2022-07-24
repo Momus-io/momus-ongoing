@@ -3,9 +3,6 @@
 
 name: CI/CD
 
-env:
- AUTHORIZATION: ${{ secrets.AUTHORIZATION }}
-
 on:
   push:
     branches: [ "main" ]
@@ -40,3 +37,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+
+      env:
+        AUTHORIZATION: ${{ secrets.AUTHORIZATION }}

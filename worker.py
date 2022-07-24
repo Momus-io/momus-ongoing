@@ -9,29 +9,28 @@ from config import env_vars
 def main():
     print("Job running...")
 
-    yesterday = (datetime.datetime.today() -
-                 datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-
-    authorization = env_vars["authorization"]
-
-    headers = {
-        "Authorization": f"Bearer {authorization}"
-    }
-
-    base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
-
     all_tweets = []
     total_iterations = 1
     tweets_added = 0
 
     def get_tweets(pagination_token=None):
+
+        yesterday = (datetime.datetime.today() -
+                     datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
+        base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
+
+        authorization = env_vars["authorization"]
+
+        headers = {
+            "Authorization": f"Bearer {authorization}"
+        }
+
         if pagination_token != None:
-            new_url = base_url + "&pagination_token=" + pagination_token
-        else:
-            new_url = base_url
+            base_url = base_url + "&pagination_token=" + pagination_token
 
         response = requests.get(
-            f"{new_url}", headers=headers)
+            f"{base_url}", headers=headers)
 
         response.raise_for_status()
 
@@ -76,7 +75,7 @@ def main():
                 print(f"Tweet ID {id} already exists in database.")
 
     except psycopg2.OperationalError as error:
-        print("Database not connected.", error)
+        print("Database not connected: ", error)
 
     finally:
         client = Client(env_vars["twilio_sid"], env_vars["twilio_token"])
@@ -87,12 +86,12 @@ def main():
             conn.close()
             print("Connection closed.")
 
-            if len(all_tweets) > 0:
-                body = f"Total tweets added: {tweets_added}."
+            if tweets_added > 0:
+                body = f"Total tweets added: {tweets_added}. So money."
             else:
-                body = "No tweets added."
+                body = "No tweets added. So steamed."
         else:
-            body = "Error connecting to DB."
+            body = "Error connecting to DB. Kinda concerning?"
 
         client.messages.create(
             to=env_vars["twilio_to"],

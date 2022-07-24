@@ -1,5 +1,8 @@
-from ..config import env_vars
+import os
 import requests
+from dotenv import load_dotenv
+
+load_dotenv(".env")
 
 TEST_DATE = "2011-08-01"
 
@@ -9,7 +12,7 @@ def test_request():
 
     base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={TEST_DATE}T00:00:00Z&end_time={TEST_DATE}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
 
-    authorization = env_vars["authorization"]
+    authorization = os.getenv("AUTHORIZATION")
 
     headers = {
         "Authorization": f"Bearer {authorization}"
@@ -19,4 +22,4 @@ def test_request():
 
     tweet_list = response.json()
 
-    assert tweet_list["meta"]["result_count"] > 0
+    assert tweet_list["meta"]["result_count"] >= 0

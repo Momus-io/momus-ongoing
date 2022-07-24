@@ -4,7 +4,7 @@
 name: CI/CD
 
 env:
-  AUTHORIZATION: ${{ secrets.AUTHORIZATION }}
+ AUTHORIZATION: ${{ secrets.AUTHORIZATION }}
 
 on:
   push:

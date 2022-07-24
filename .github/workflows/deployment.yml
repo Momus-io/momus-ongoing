@@ -3,9 +3,6 @@
 
 name: CI/CD
 
-env:
- AUTHORIZATION: ${{ secrets.AUTHORIZATION }}
-
 on:
   push:
     branches: [ "main" ]

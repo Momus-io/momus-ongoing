@@ -11,7 +11,7 @@ def test_request():
     base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={TEST_DATE}T00:00:00Z&end_time={TEST_DATE}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
 
     authorization = os.getenv("AUTHORIZATION")
-    print(authorization)
+
     headers = {
         "Authorization": f"Bearer {authorization}"
     }

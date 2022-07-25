@@ -14,8 +14,8 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    environment: momusio-tweet-getter
 
     steps:
     - uses: actions/checkout@v3

@@ -5,6 +5,9 @@ import psycopg2
 from twilio.rest import Client
 from config import env_vars
 
+yesterday = (datetime.datetime.today() -
+             datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
 
 def main():
     print("Job running...")
@@ -12,11 +15,9 @@ def main():
     all_tweets = []
     total_iterations = 1
     tweets_added = 0
+    global yesterday
 
     def get_tweets(pagination_token=None):
-
-        yesterday = (datetime.datetime.today() -
-                     datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
         base_url = f"https://api.twitter.com/2/users/133110529/tweets?max_results=100&start_time={yesterday}T00:00:00Z&end_time={yesterday}T23:59:59Z&tweet.fields=created_at&exclude=retweets"
 
@@ -87,7 +88,8 @@ def main():
             print("Connection closed.")
 
             if tweets_added > 0:
-                body = f"Total tweets added: {tweets_added}. So money."
+                url = f"https://dbclassic.herokuapp.com/tweet?date={yesterday}"
+                body = f"Total tweets added: {tweets_added}. So money: {url}"
             else:
                 body = "No tweets added. So steamed."
         else:
